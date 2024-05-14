@@ -9,23 +9,38 @@
 #include <zephyr/devicetree.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/drivers/pwm.h>
-#define LOG_LEVEL	CONFIG_LOG_DEFAULT_LEVEL
+
+#include "../bluetooth/bluetooth_infra.h"
+
 LOG_MODULE_REGISTER(LVGL_Callbacks, LOG_LEVEL_INF);
 
 
-void wifi_value_changed(lv_event_t * e)
-{
-	// Your code here
+void ble_switch_callback(lv_event_t * e) {
+    int8_t ret;
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * obj = lv_event_get_target(e);
+    if(lv_obj_has_state(obj, LV_STATE_CHECKED)) {
+        // Enable Bluetooth and start advertisement.
+        ret = enable_bluetooth_and_start_advertisement();
+        if (ret < 0) LOG_ERR("Failed to enable Bluetooth and start advertisement, exiting...");
+        else LOG_INF("Bluetooth enabled and advertisement started.");
+    } else {
+        // Disable Bluetooth and stop advertisement.
+        ret = disable_bluetooth_and_stop_advertisement();
+        if (ret < 0) LOG_ERR("Failed to disable Bluetooth and stop advertisement, exiting...");
+        else LOG_INF("Bluetooth disabled and advertisement stopped.");
+    }
 }
 
-void brightness_changed_callback(lv_obj_t * target, lv_event_t * e) {
+void brightness_changed_callback(lv_event_t * e) {
+    lv_obj_t * obj = lv_event_get_target(e);
 	const struct pwm_dt_spec backlight = PWM_DT_SPEC_GET_BY_IDX(DT_NODELABEL(pwm_lcd0), 0);
     if (!pwm_is_ready_dt(&backlight)) {
         LOG_ERR("PWM device is not ready, exiting...");
     }
 
 	// Normalize the slider value from 0-100 to 100-1000 range.
-	int value = lv_slider_get_value(target);
+	int value = lv_slider_get_value(obj);
 	value = (value * 9) + 100;
 
     // Change the PWM pulse width according to slider value.

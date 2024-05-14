@@ -10,8 +10,8 @@
 extern "C" {
 #endif
 
-void brightness_changed_callback(lv_obj_t * target, lv_event_t * e);
-void wifi_value_changed(lv_event_t * e);
+void brightness_changed_callback(lv_event_t * e);
+void ble_switch_callback(lv_event_t * e);
 
 #ifdef __cplusplus
 } /*extern "C"*/
