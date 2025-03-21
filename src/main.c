@@ -18,51 +18,34 @@
 #include <zephyr/drivers/display.h>
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/pwm.h>
-#include <zephyr/drivers/rtc.h>
 
-#include "user_interface/ui.h"
-#include "bluetooth/current_time_service.h"
+#include "display/display.h"
+#include "timeutils/timeutils.h"
 
-LOG_MODULE_REGISTER(ZephyrWatch, LOG_LEVEL_INF);
+// Define the logger.
+LOG_MODULE_REGISTER(ZephyrWatch, LOG_LEVEL_DBG);
 
+// Global value to hold time value in UNIX time.
+uint32_t unix_time = 1748554674;
+
+// Define timers to track real time.
+void update_unix_time_callback(struct k_timer *timer);
+void update_clock_view_callback(struct k_timer *timer);
+K_TIMER_DEFINE(unix_time_timer, update_unix_time_callback, NULL);
+K_TIMER_DEFINE(clock_view_timer, update_clock_view_callback, NULL);
+
+// Define the weekday names.
+const char* weekdays[] = {
+    "Sunday", "Monday", "Tuesday", "Wednesday",
+    "Thursday", "Friday", "Saturday"
+};
 
 int main(void) {
 	int ret;
 
-	// Initialize the RTC device.
-	const struct device *rtc_dev = DEVICE_DT_GET(DT_NODELABEL(rtc));
-	if (!device_is_ready(rtc_dev)) {
-		LOG_ERR("RTC device is not ready, exiting...");
-		return 0;
-	}
-	LOG_INF("RTC device is ready.");
-
-	// struct rtc_time time = {
-	// 	.tm_sec = 0,
-	// 	.tm_min = 58,
-	// 	.tm_hour = 0,
-	// 	.tm_mday = 15,
-	// 	.tm_mon = 5,
-	// 	.tm_year = 2024,
-	// 	.tm_wday = 4,
-	// 	.tm_yday = 0,
-	// 	.tm_isdst = 0,
-	// 	.tm_nsec = 0,
-	// };
-
-	// ret = rtc_set_time(rtc_dev, &time);
-	// if (ret < 0) {
-	// 	LOG_ERR("Failed to set time to RTC, exiting...");
-	// 	return 0;
-	// }
-	// LOG_INF("Time set to RTC.");
-
-	// ret = rtc_get_time(rtc_dev, &time);
-	// if (ret < 0) {
-	// 	LOG_ERR("Failed to get time from RTC, exiting...");
-	// 	return 0;
-	// }
-	//LOG_INF("Current time: %d-%d-%d %d:%d:%d", time.tm_year, time.tm_mon, time.tm_mday, time.tm_hour, time.tm_min, time.tm_sec);
+	// Start the timer to track the real time.
+	k_timer_start(&unix_time_timer, K_MSEC(0), K_MSEC(1000));
+	k_timer_start(&clock_view_timer, K_SECONDS(60), K_SECONDS(60));
 
     // Check if the display device is ready.
 	const struct device *display_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
@@ -88,7 +71,7 @@ int main(void) {
 	LOG_INF("PWM pulse for LCD backlight set.");
 
     // Initialize the display device with initial GUI.
-    ui_init();
+    display_init();
 	LOG_INF("UI initialized.");
 
     lv_task_handler();
@@ -96,6 +79,27 @@ int main(void) {
 
 	while (1) {
 		lv_task_handler();
-        k_sleep(K_USEC(10));
+        k_sleep(K_SECONDS(1));
 	}
+}
+
+/* UPDATE_UNIX_TIME_CALLBACK
+ * This timer callback function runs every second to update
+ * the value inside the unix_time to track the real time.
+ * It is neccessary to use timers instead of configuring the
+ * RTC because the PoC board does not have RTC support in Zephyr.
+ */
+void update_unix_time_callback(struct k_timer *timer) {
+	unix_time += 1;
+}
+
+/* UPDATE_CLOCK_VIEW_CALLBACK
+ * This timer callback function runs every minute to update
+ * the clock view in the LVGL UI by using the unix_time variable.
+ */
+void update_clock_view_callback(struct k_timer *timer) {
+    utc_time_t local = unix_to_localtime(unix_time, +1); // UTC+1
+	LOG_INF("Local : %04u-%02u-%02u %02u:%02u:%02u (%s) [UTC+1]",
+           local.year, local.month, local.day, local.hour, local.minute, local.second,
+           weekdays[local.weekday]);
 }
