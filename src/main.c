@@ -20,13 +20,16 @@
 #include <zephyr/drivers/pwm.h>
 
 #include "display/display.h"
+#include "display/screens/home/home.h"
 #include "timeutils/timeutils.h"
+#include "devicetwin/devicetwin.h"
 
 // Define the logger.
 LOG_MODULE_REGISTER(ZephyrWatch, LOG_LEVEL_DBG);
 
 // Global value to hold time value in UNIX time.
 uint32_t unix_time = 1748554674;
+int8_t utc_zone = +1;
 
 // Define timers to track real time.
 void update_unix_time_callback(struct k_timer *timer);
@@ -42,6 +45,13 @@ const char* weekdays[] = {
 
 int main(void) {
 	int ret;
+
+    // Create the device twin.
+    device_twin_t* device_twin = create_device_twin_instance(unix_to_localtime(unix_time, utc_zone), utc_zone);
+    if (!device_twin) {
+        LOG_ERR("Cannot create device twin instance.");
+        return 0;
+    }
 
 	// Start the timer to track the real time.
 	k_timer_start(&unix_time_timer, K_MSEC(0), K_MSEC(1000));
@@ -98,8 +108,28 @@ void update_unix_time_callback(struct k_timer *timer) {
  * the clock view in the LVGL UI by using the unix_time variable.
  */
 void update_clock_view_callback(struct k_timer *timer) {
-    utc_time_t local = unix_to_localtime(unix_time, +1); // UTC+1
-	LOG_INF("Local : %04u-%02u-%02u %02u:%02u:%02u (%s) [UTC+1]",
-           local.year, local.month, local.day, local.hour, local.minute, local.second,
-           weekdays[local.weekday]);
+    // Get the device twin to find UTC zone.
+    device_twin_t* device_twin = get_device_twin_instance();
+
+    // Construct the local time from UNIX time and save it.
+    utc_time_t local_time = unix_to_localtime(unix_time, device_twin->utc_zone);
+    device_twin->current_time = local_time;
+
+    // Log the current time.
+    LOG_INF("Setting new time. %04u-%02u-%02u %02u:%02u:%02u (%s) [UTC %d]",
+        device_twin->current_time.year,
+        device_twin->current_time.month,
+        device_twin->current_time.day,
+        device_twin->current_time.hour,
+        device_twin->current_time.minute,
+        device_twin->current_time.second,
+        weekdays[device_twin->current_time.weekday],
+        device_twin->utc_zone
+    );
+
+    // Update the clock view.
+    uint8_t ret = home_screen_set_clock(device_twin->current_time.hour, device_twin->current_time.minute);
+    if (ret != 0) {
+        LOG_ERR("Failed to update the clock view.");
+    }
 }
