@@ -15,9 +15,9 @@ void home_screen_init();
 void home_screen_event(lv_event_t * e);
 
 // Render labels.
-void render_clock_label();
-void render_date_label();
-void render_day_label();
+void render_clock_label(lv_obj_t *flex_element);
+void render_date_label(lv_obj_t *flex_element);
+void render_day_label(lv_obj_t *flex_element);
 
 // Set the values on the home-screen. Returns 0 if successful, 1 otherwise.
 uint8_t home_screen_set_clock(uint8_t hour, uint8_t minute);
