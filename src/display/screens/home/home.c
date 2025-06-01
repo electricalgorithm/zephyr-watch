@@ -4,6 +4,8 @@
 // Holds the home screen object.
 lv_obj_t *home_screen;
 lv_obj_t *label_clock;
+lv_obj_t *label_date;
+lv_obj_t *label_day;
 
 void home_screen_init() {
     // Create the screen object which is the LV object with no parent.
@@ -11,14 +13,31 @@ void home_screen_init() {
     // Remove the ability to scroll the screen.
     lv_obj_remove_flag(home_screen, LV_OBJ_FLAG_SCROLLABLE);
 
+    // Render items in the screen.
+    render_clock_label();
+    render_date_label();
+    render_day_label();
+    
+    // Add an event handler for all possible events.
+    lv_obj_add_event_cb(home_screen, home_screen_event, LV_EVENT_ALL, NULL);
+}
+
+void home_screen_event(lv_event_t * e) {
+    // lv_event_code_t event_code = lv_event_get_code(e);lv_obj_t * target = lv_event_get_target(e);
+}
+
+void render_clock_label() {
     // Create a new label and expand its size to content size and align it to center.
     label_clock = lv_label_create(home_screen);
     lv_obj_set_width(label_clock, LV_SIZE_CONTENT);
     lv_obj_set_height(label_clock, LV_SIZE_CONTENT);
     lv_obj_set_align(label_clock, LV_ALIGN_CENTER);
+
+    // Align to center but with upward Y offset.
+    lv_obj_align(label_clock, LV_ALIGN_CENTER, 0, -20);
     
     // Set the default text.
-    lv_label_set_text(label_clock, "HH\nMM");
+    lv_label_set_text(label_clock, "HH:mm");
 
     // Format the clock text string.
     /* 1. Set the letter spacing to 5. (Between letters)
@@ -32,13 +51,30 @@ void home_screen_init() {
     lv_obj_set_style_text_align(label_clock, LV_TEXT_ALIGN_AUTO, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_decor(label_clock, LV_TEXT_DECOR_NONE, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(label_clock, &lv_font_montserrat_46, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    // Add an event handler for all possible events.
-    lv_obj_add_event_cb(home_screen, home_screen_event, LV_EVENT_ALL, NULL);
 }
 
-void home_screen_event(lv_event_t * e) {
-    // lv_event_code_t event_code = lv_event_get_code(e);lv_obj_t * target = lv_event_get_target(e);
+void render_date_label() {
+    // Create a new label and expand its size to content size and align it to center.
+    label_date = lv_label_create(home_screen);
+
+    // Align it to the bottom of the clock label with a margin of 2x5y pixels.
+    lv_obj_align_to(label_date, label_clock, LV_ALIGN_OUT_BOTTOM_MID, -65, 0);
+
+    // Set the default text.
+    lv_label_set_text(label_date, "YYYY-MM-DD");
+    lv_obj_set_style_text_font(label_date, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
+}
+
+void render_day_label() {
+    // Create a new label and expand its size to content size and align it to center.
+    label_day = lv_label_create(home_screen);
+
+    // Align it to the bottom of the clock label with a margin of 2x5y pixels.
+    lv_obj_align_to(label_day, label_clock, LV_ALIGN_OUT_BOTTOM_MID, +45, 0);
+
+    // Set the default text.
+    lv_label_set_text(label_day, "DAY");
+    lv_obj_set_style_text_font(label_day, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
 }
 
 uint8_t home_screen_set_clock(uint8_t hour, uint8_t minute) {
@@ -46,6 +82,26 @@ uint8_t home_screen_set_clock(uint8_t hour, uint8_t minute) {
     if (label_clock == NULL) return 1;
     // Set the text of the label_clock to the current time in 24-hour format.
     lv_label_set_text_fmt(label_clock, "%02d:%02d", hour, minute);
+    // Update the display.
+    lv_disp_flush_ready(lv_disp_get_default());
+    return 0;
+}
+
+uint8_t home_screen_set_date(uint16_t year, uint8_t month, uint8_t day) {
+    // Check if the label_date is NULL.
+    if (label_date == NULL) return 1;
+    // Set the text of the label_date to the current date in "YYYY-MM-DD" format.
+    lv_label_set_text_fmt(label_date, "%04u-%02d-%02d", year,  month + 1, day);
+    // Update the display.
+    lv_disp_flush_ready(lv_disp_get_default());
+    return 0;
+}
+
+uint8_t home_screen_set_day(const char* day) {
+    // Check if the label_clock is NULL.
+    if (label_day == NULL) return 1;
+    // Set the text of the label_day to the 3 character day name.
+    lv_label_set_text(label_day, day);
     // Update the display.
     lv_disp_flush_ready(lv_disp_get_default());
     return 0;

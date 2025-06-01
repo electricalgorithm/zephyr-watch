@@ -34,14 +34,13 @@ int8_t utc_zone = +1;
 // Define timers to track real time.
 void update_unix_time_callback(struct k_timer *timer);
 void update_clock_view_callback(struct k_timer *timer);
+void update_date_day_view_callback(struct k_timer *timer);
 K_TIMER_DEFINE(unix_time_timer, update_unix_time_callback, NULL);
 K_TIMER_DEFINE(clock_view_timer, update_clock_view_callback, NULL);
+K_TIMER_DEFINE(date_day_view_timer, update_date_day_view_callback, NULL);
 
 // Define the weekday names.
-const char* weekdays[] = {
-    "Sunday", "Monday", "Tuesday", "Wednesday",
-    "Thursday", "Friday", "Saturday"
-};
+const char* weekdays[] = { "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT" };
 
 int main(void) {
 	int ret;
@@ -54,8 +53,9 @@ int main(void) {
     }
 
 	// Start the timer to track the real time.
-	k_timer_start(&unix_time_timer, K_MSEC(0), K_MSEC(1000));
-	k_timer_start(&clock_view_timer, K_SECONDS(60), K_SECONDS(60));
+	k_timer_start(&unix_time_timer, K_MSEC(60), K_MSEC(1000));
+	k_timer_start(&clock_view_timer, K_MSEC(60), K_SECONDS(30));
+    k_timer_start(&date_day_view_timer, K_MSEC(60), K_MINUTES(1));
 
     // Check if the display device is ready.
 	const struct device *display_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
@@ -131,5 +131,32 @@ void update_clock_view_callback(struct k_timer *timer) {
     uint8_t ret = home_screen_set_clock(device_twin->current_time.hour, device_twin->current_time.minute);
     if (ret != 0) {
         LOG_ERR("Failed to update the clock view.");
+    }
+}
+
+/* UPDATE_DATE_DAY_VIEW_CALLBACK
+ */
+void update_date_day_view_callback(struct k_timer *timer) {
+    // Get the device twin to find UTC zone.
+    device_twin_t* device_twin = get_device_twin_instance();
+
+    // Construct the local time from UNIX time and save it.
+    utc_time_t local_time = unix_to_localtime(unix_time, device_twin->utc_zone);
+    device_twin->current_time = local_time;
+
+    // Update the date view.
+    uint8_t ret = home_screen_set_date(
+        device_twin->current_time.year,
+        device_twin->current_time.month,
+        device_twin->current_time.day
+    );
+    if (ret != 0) {
+        LOG_ERR("Failed to update the date view.");
+    }
+
+    // Update the day view.
+    ret = home_screen_set_day(weekdays[device_twin->current_time.weekday]);
+    if (ret != 0) {
+        LOG_ERR("Failed to update the day view.");
     }
 }

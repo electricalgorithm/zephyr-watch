@@ -14,9 +14,15 @@ extern lv_obj_t *home_screen;
 void home_screen_init();
 void home_screen_event(lv_event_t * e);
 
-// Set the time on the clock. Returns 0 if successful, 1 otherwise.
-uint8_t home_screen_set_clock(uint8_t hour, uint8_t minute);
+// Render labels.
+void render_clock_label();
+void render_date_label();
+void render_day_label();
 
+// Set the values on the home-screen. Returns 0 if successful, 1 otherwise.
+uint8_t home_screen_set_clock(uint8_t hour, uint8_t minute);
+uint8_t home_screen_set_date(uint16_t year, uint8_t month, uint8_t day);
+uint8_t home_screen_set_day(const char* day);
 
 #ifdef __cplusplus
 } // extern "C"
