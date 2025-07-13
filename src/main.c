@@ -1,7 +1,7 @@
-/*
- * Copyright (c) 2018 Jan Van Winkel <jan.van_winkel@dxplore.eu>
+/**
+ * @file src/main.c
  *
- * SPDX-License-Identifier: Apache-2.0
+ * @brief Main file for the application.
  */
 
 #include <stdio.h>
@@ -18,29 +18,42 @@
 #include <zephyr/drivers/display.h>
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/pwm.h>
+#include <zephyr/bluetooth/bluetooth.h>
 
 #include "display/display.h"
 #include "display/screens/home/home.h"
 #include "timeutils/timeutils.h"
 #include "devicetwin/devicetwin.h"
+#include "bluetooth/infrastructure.h"
 
 // Define the logger.
 LOG_MODULE_REGISTER(ZephyrWatch, LOG_LEVEL_DBG);
 
-// Global value to hold time value in UNIX time.
+// Global values to hold time.
 uint32_t unix_time = 1748554674;
 int8_t utc_zone = +1;
+const char* weekdays[] = { "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT" };
 
-// Define timers to track real time.
+// Define the timer callbacks' prototypes.
 void update_unix_time_callback(struct k_timer *timer);
 void update_clock_view_callback(struct k_timer *timer);
 void update_date_day_view_callback(struct k_timer *timer);
+// Define the work queues' prototypes.
+void clock_update_worker(struct k_work *work);
+void date_day_update_worker(struct k_work *work);
+
+static struct k_work_q ui_work_q;
+static K_THREAD_STACK_DEFINE(ui_stack_area, 4096);
+
+// Work items for deferred UI tasks
+static struct k_work clock_update_work;
+static struct k_work date_day_update_work;
+
+// Define timers.
 K_TIMER_DEFINE(unix_time_timer, update_unix_time_callback, NULL);
 K_TIMER_DEFINE(clock_view_timer, update_clock_view_callback, NULL);
 K_TIMER_DEFINE(date_day_view_timer, update_date_day_view_callback, NULL);
 
-// Define the weekday names.
-const char* weekdays[] = { "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT" };
 
 int main(void) {
 	int ret;
@@ -51,11 +64,13 @@ int main(void) {
         LOG_ERR("Cannot create device twin instance.");
         return 0;
     }
+    LOG_INF("Device twin instance created successfully.");
 
 	// Start the timer to track the real time.
-	k_timer_start(&unix_time_timer, K_MSEC(60), K_MSEC(1000));
+	k_timer_start(&unix_time_timer, K_MSEC(60), K_SECONDS(1));
 	k_timer_start(&clock_view_timer, K_MSEC(60), K_SECONDS(30));
     k_timer_start(&date_day_view_timer, K_MSEC(60), K_MINUTES(1));
+    LOG_INF("Timers started successfully.");
 
     // Check if the display device is ready.
 	const struct device *display_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
@@ -84,13 +99,56 @@ int main(void) {
     display_init();
 	LOG_INF("UI initialized.");
 
+    // Start the UI work queue.
+    k_work_queue_start(&ui_work_q, ui_stack_area, K_THREAD_STACK_SIZEOF(ui_stack_area), 
+    K_PRIO_PREEMPT(5), NULL);
+	LOG_INF("UI work queue started.");
+
+    // Initialize the work items.
+    k_work_init(&clock_update_work, clock_update_worker);
+    k_work_init(&date_day_update_work, date_day_update_worker);
+
+    // Start timers after work queue is ready - reduced frequency to prevent queue overflow
+    k_timer_start(&unix_time_timer, K_MSEC(1000), K_SECONDS(1));
+    k_timer_start(&clock_view_timer, K_MSEC(2000), K_SECONDS(30));
+    k_timer_start(&date_day_view_timer, K_MSEC(3000), K_MINUTES(1));
+    LOG_INF("Timers are set.");
+
+    // Initialize LVGL first and let UI stabilize
     lv_task_handler();
     display_blanking_off(display_dev);
 
+    // Give the system more time to stabilize before initializing Bluetooth
+    k_sleep(K_SECONDS(2));
+
+    // Initialize the Bluetooth stack.
+    ret = enable_bluetooth_and_start_advertisement();
+    if (ret) {
+        LOG_ERR("Bluetooth init failed (ret %d).", ret);
+        return ret;
+    }
+    LOG_INF("Bluetooth subsytem is initialized.");
+
 	while (1) {
 		lv_task_handler();
-        k_sleep(K_SECONDS(1));
+        k_sleep(K_MSEC(20)); // Increased sleep time to reduce system load
 	}
+}
+
+/* UPDATE_CLOCK_VIEW_CALLBACK
+ * This function is called by the timer to update the clock view.
+ * It sends an event to the UI work queue to update the clock view.
+ */
+void update_clock_view_callback(struct k_timer *timer) {
+    k_work_submit_to_queue(&ui_work_q, &clock_update_work);
+}
+
+/* UPDATE_DATE_DAY_VIEW_CALLBACK
+ * This function is called by the timer to update the date and day views.
+ * It sends an event to the UI work queue to update the date and day views.
+ */
+void update_date_day_view_callback(struct k_timer *timer) {
+    k_work_submit_to_queue(&ui_work_q, &date_day_update_work);
 }
 
 /* UPDATE_UNIX_TIME_CALLBACK
@@ -103,29 +161,18 @@ void update_unix_time_callback(struct k_timer *timer) {
 	unix_time += 1;
 }
 
-/* UPDATE_CLOCK_VIEW_CALLBACK
- * This timer callback function runs every minute to update
- * the clock view in the LVGL UI by using the unix_time variable.
+/* CLOCK_UPDATE_WORKER
+ * This function is called by the UI work queue to update the clock view.
+ * It updates the current time in the device twin and then
+ * calls the home screen set clock function.
  */
-void update_clock_view_callback(struct k_timer *timer) {
+void clock_update_worker(struct k_work *work) {
     // Get the device twin to find UTC zone.
     device_twin_t* device_twin = get_device_twin_instance();
 
     // Construct the local time from UNIX time and save it.
     utc_time_t local_time = unix_to_localtime(unix_time, device_twin->utc_zone);
     device_twin->current_time = local_time;
-
-    // Log the current time.
-    LOG_INF("Setting new time. %04u-%02u-%02u %02u:%02u:%02u (%s) [UTC %d]",
-        device_twin->current_time.year,
-        device_twin->current_time.month,
-        device_twin->current_time.day,
-        device_twin->current_time.hour,
-        device_twin->current_time.minute,
-        device_twin->current_time.second,
-        weekdays[device_twin->current_time.weekday],
-        device_twin->utc_zone
-    );
 
     // Update the clock view.
     uint8_t ret = home_screen_set_clock(device_twin->current_time.hour, device_twin->current_time.minute);
@@ -134,9 +181,12 @@ void update_clock_view_callback(struct k_timer *timer) {
     }
 }
 
-/* UPDATE_DATE_DAY_VIEW_CALLBACK
+/* DATE_DAY_UPDATE_WORKER
+ * This function is called by the UI work queue to update the date and day view.
+ * It updates the current time in the device twin and then
+ * calls the home screen set date function.
  */
-void update_date_day_view_callback(struct k_timer *timer) {
+void date_day_update_worker(struct k_work *work) {
     // Get the device twin to find UTC zone.
     device_twin_t* device_twin = get_device_twin_instance();
 
@@ -144,18 +194,12 @@ void update_date_day_view_callback(struct k_timer *timer) {
     utc_time_t local_time = unix_to_localtime(unix_time, device_twin->utc_zone);
     device_twin->current_time = local_time;
 
-    // Update the date view.
-    uint8_t ret = home_screen_set_date(
-        device_twin->current_time.year,
-        device_twin->current_time.month,
-        device_twin->current_time.day
-    );
+    // Update the date and day views.
+    uint8_t ret = home_screen_set_date(local_time.year, local_time.month, local_time.day);
     if (ret != 0) {
         LOG_ERR("Failed to update the date view.");
     }
-
-    // Update the day view.
-    ret = home_screen_set_day(weekdays[device_twin->current_time.weekday]);
+    ret = home_screen_set_day(weekdays[local_time.weekday]);
     if (ret != 0) {
         LOG_ERR("Failed to update the day view.");
     }
