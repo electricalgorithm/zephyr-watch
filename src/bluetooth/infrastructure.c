@@ -2,9 +2,7 @@
 #include <zephyr/bluetooth/gatt.h>
 #include <zephyr/logging/log.h>
 
-
 LOG_MODULE_REGISTER(ZephyrWatch_BluetoothInfra, LOG_LEVEL_INF);
-
 
 static const struct bt_data m_ad[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
@@ -36,7 +34,7 @@ BT_CONN_CB_DEFINE(conn_callbacks) = {
 /* The API function to enable Bluetooth and start advertisement. */
 uint8_t enable_bluetooth_and_start_advertisement() {
 	int err;
-
+	
     err = bt_enable(NULL);
 	if (err) {
 		LOG_ERR("Bluetooth init failed (err %d).", err);
