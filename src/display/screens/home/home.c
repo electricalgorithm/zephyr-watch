@@ -74,7 +74,7 @@ uint8_t home_screen_set_date(uint16_t year, uint8_t month, uint8_t day) {
     // Check if the label_date is NULL.
     if (label_date == NULL) return 1;
     // Set the text of the label_date to the current date in "YYYY-MM-DD" format.
-    lv_label_set_text_fmt(label_date, "%04u-%02d-%02d", year,  month + 1, day);
+    lv_label_set_text_fmt(label_date, "%04u-%02d-%02d", year,  month, day);
     // Update the display.
     lv_disp_flush_ready(lv_disp_get_default());
     return 0;

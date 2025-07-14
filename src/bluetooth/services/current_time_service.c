@@ -3,6 +3,7 @@
 #include <zephyr/bluetooth/gatt.h>
 #include <string.h>
 
+#include "current_time_service.h"
 #include "timeutils/timeutils.h"
 #include "devicetwin/devicetwin.h"
 
@@ -27,22 +28,26 @@ static ssize_t m_time_write_callback(
 	uint32_t unix_timestamp = sys_le32_to_cpu(*(uint32_t *)buf);
 	LOG_INF("Received UNIX timestamp: %u", unix_timestamp);
 
-	// Convert UNIX timestamp to UTC time
-	utc_time_t utc_time = unix_to_utc(unix_timestamp);
-	
-	// Get the device twin instance
+	// Get the device twin instance to get the UTC zone
 	device_twin_t *device_twin = get_device_twin_instance();
 	if (device_twin == NULL) {
 		LOG_ERR("Failed to get device twin instance.");
 		return BT_GATT_ERR(BT_ATT_ERR_UNLIKELY);
 	}
 
-	// Update the device twin's current time
-	device_twin->current_time = utc_time;
+	// Convert UNIX timestamp to local time using the device's UTC zone
+	utc_time_t local_time = unix_to_localtime(unix_timestamp, device_twin->utc_zone);
+
+	// Update the device twin's current time with local time
+	device_twin->current_time = local_time;
 	
-	LOG_INF("Current time updated: %04d-%02d-%02d %02d:%02d:%02d", 
-		utc_time.year, utc_time.month, utc_time.day,
-		utc_time.hour, utc_time.minute, utc_time.second);
+	// Update the global unix time used by the UI system
+	update_global_unix_time(unix_timestamp);
+
+	LOG_INF("Current time updated to local time: %04d-%02d-%02d %02d:%02d:%02d (UTC%+d)", 
+		local_time.year, local_time.month, local_time.day,
+		local_time.hour, local_time.minute, local_time.second,
+		device_twin->utc_zone);
 
 	return len;
 }
