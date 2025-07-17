@@ -41,7 +41,7 @@ uint8_t enable_bluetooth_and_start_advertisement() {
 		return err;
 	}
 
-	LOG_INF("Bluetooth initialized.");
+	LOG_DBG("Bluetooth initialized.");
 
 	if (IS_ENABLED(CONFIG_SETTINGS)) {
 		settings_load();
@@ -53,7 +53,7 @@ uint8_t enable_bluetooth_and_start_advertisement() {
 		return err;
 	}
 
-	LOG_INF("Advertising successfully started.");
+	LOG_DBG("Advertising successfully started.");
     return 0;
 }
 
@@ -66,7 +66,7 @@ uint8_t disable_bluetooth_and_stop_advertisement() {
 		return err;
 	}
 
-	LOG_INF("Advertising successfully stopped.");
+	LOG_DBG("Advertising successfully stopped.");
 
 	err = bt_disable();
 	if (err) {
@@ -74,6 +74,6 @@ uint8_t disable_bluetooth_and_stop_advertisement() {
 		return err;
 	}
 
-	LOG_INF("Bluetooth disabled.");
+	LOG_DBG("Bluetooth disabled.");
 	return 0;
 }
