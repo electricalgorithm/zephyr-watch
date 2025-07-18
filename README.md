@@ -3,6 +3,7 @@
 This is a smart-watch project based on ESP32, LVGL and Zephyr RTOS. I started it as a side project to learn about Zephyr, BLE and LVGL. As you can imagine, it was a big kick to learn about many stuff at oonce. Now, I'm proud to present you. Feel free to contribute and/or contact to me!
 
 ### Features
+- Real-Time Counter to Track the Time
 - LVGL for UI and Graphics Rendering
 - BLE Current Time Service (GATT) for Time Synchronization
 - BLE Device Information Service (DIS) for Device Metadata
