@@ -1,6 +1,6 @@
 # ESP32 Zephyr RTOS Watch
 
-This is a smart-watch project based on ESP32, LVGL and Zephyr RTOS. I started it as a side project to learn about Zephyr, BLE and LVGL. As you can imagine, it was a big kick to learn about many stuff at oonce. Now, I'm proud to present you. Feel free to contribute and/or contact to me!
+This is a smart-watch project based on ESP32, LVGL and Zephyr RTOS. I started it as a side project to learn about these technologies, but now quite happy to share it with open-source community!
 
 ### Features
 - Real-Time Counter to Track the Time
