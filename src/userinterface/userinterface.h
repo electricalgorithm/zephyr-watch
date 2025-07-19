@@ -21,6 +21,9 @@ void user_interface_init();
 /* Refresh/process the user interface jobs. */
 void user_interface_task_handler();
 
+/* Trigger an UI update. It is useful to update clock with external source. */
+void trigger_ui_update();
+
 #ifdef __cplusplus
 } // extern "C"
 #endif
