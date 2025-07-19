@@ -1,21 +1,22 @@
-/** Display initialization interface for LVGL-based UI setup.
- * Provides functions to initialize the display system and set up the default theme for the smartwatch interface.
+/** Display Subsystem for ZephyrWatch.
+ * Provides functions to initialize the display system.
  *
  * @license GNU v3
  * @maintainer electricalgorithm @ github
  */
 
-#ifndef _SMART_WATCH_UI_UI_H
-#define _SMART_WATCH_UI_UI_H
+#ifndef _DISPLAY_H
+#define _DISPLAY_H
+
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "lvgl.h"
-#include "display/screens/home/home.h"
-
-void display_init();
+int enable_display_subsystem();
+int disable_display_subsystem();
+int change_brightness(uint8_t perc);
 
 #ifdef __cplusplus
 } // extern "C"

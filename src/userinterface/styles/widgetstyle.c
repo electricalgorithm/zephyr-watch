@@ -1,12 +1,13 @@
 /** Widget styling implementation for LVGL components.
- * Implements shared widget styles including borderless styles for clean UI appearance across the smartwatch interface.
+ * Implements shared widget styles including borderless styles for clean UI appearance across the
+ * smartwatch interface.
  *
  * @license GNU v3
  * @maintainer electricalgorithm @ github
  */
 
 #include "lvgl.h"
-#include "display/styles/widgetstyle.h"
+#include "userinterface/styles/widgetstyle.h"
 
 static lv_style_t style_no_border;
 
@@ -30,4 +31,3 @@ void widget_style_init() {
 const lv_style_t* get_widget_style_no_border() {
     return &style_no_border;
 }
-

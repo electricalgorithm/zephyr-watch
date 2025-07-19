@@ -1,5 +1,6 @@
-/** Home screen interface for the main smartwatch display.
- * Provides functions to initialize and manage the home screen UI including clock, date, and day display components.
+/** Home screen interface for the main smartwatch userinterface.
+ * Provides functions to initialize and manage the home screen UI including clock, date, and day 
+ * userinterface components.
  *
  * @license GNU v3
  * @maintainer electricalgorithm @ github
@@ -14,7 +15,7 @@ extern "C" {
 
 #include "lvgl.h"
 
-// The screen object to be used in the display.
+// The screen object to be used in the userinterface.
 extern lv_obj_t *home_screen;
 
 // The init and event functions for the screen.
@@ -29,7 +30,7 @@ void render_day_label(lv_obj_t *flex_element);
 // Set the values on the home-screen. Returns 0 if successful, 1 otherwise.
 uint8_t home_screen_set_clock(uint8_t hour, uint8_t minute);
 uint8_t home_screen_set_date(uint16_t year, uint8_t month, uint8_t day);
-uint8_t home_screen_set_day(const char* day);
+uint8_t home_screen_set_day(uint8_t day_no);
 
 #ifdef __cplusplus
 } // extern "C"
