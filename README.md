@@ -1,6 +1,17 @@
-# ESP32 Zephyr RTOS Watch
+<p align="center">
+  <h1 align="center">ZephyrWatch</h1>
+</p>
+<p align="center">
+an open-source smartwatch based on lvgl, zephyr and ble
+</p>
 
-This is a smart-watch project based on ESP32, LVGL and Zephyr RTOS. I started it as a side project to learn about these technologies, but now quite happy to share it with open-source community!
+<div align="center">
+
+![version](https://img.shields.io/github/package-json/v/electricalgorithm/zephyr-watch?logoColor=blue&style=flat-square) ![](https://img.shields.io/badge/license-GNUv3-critical?style=flat-square) ![stars](https://img.shields.io/github/stars/electricalgorithm/zephyr-watch?style=flat-square) ![GitHub branch check runs](https://img.shields.io/github/check-runs/electricalgorithm/zephyr-watch/main?style=flat-square)
+
+---
+
+</div>
 
 ### Features
 - Real-Time Counter to Track the Time
