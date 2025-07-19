@@ -57,7 +57,7 @@ K_TIMER_DEFINE(clock_view_timer, update_clock_view_callback, NULL);
 
 
 int main(void) {
-	int ret;
+    int ret;
 
     // Create the device twin.
     device_twin_t* device_twin = create_device_twin_instance(unix_to_localtime(unix_time, utc_zone), utc_zone);
@@ -68,19 +68,19 @@ int main(void) {
     LOG_DBG("Device twin instance created successfully.");
 
     // Check if the display device is ready.
-	const struct device *display_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
-	if (!device_is_ready(display_dev)) {
-		LOG_ERR("Display device is not ready, exiting...");
-		return 0;
-	}
-	LOG_DBG("Display device is ready.");
+    const struct device *display_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
+    if (!device_is_ready(display_dev)) {
+        LOG_ERR("Display device is not ready, exiting...");
+        return 0;
+    }
+    LOG_DBG("Display device is ready.");
 
     const struct pwm_dt_spec backlight = PWM_DT_SPEC_GET_BY_IDX(DT_NODELABEL(pwm_lcd0), 0);
     if (!pwm_is_ready_dt(&backlight)) {
         LOG_ERR("PWM device is not ready, exiting...");
         return 0;
     }
-	LOG_DBG("PWM device is ready.");
+    LOG_DBG("PWM device is ready.");
 
     // Initialize the PWM device.
     ret = pwm_set_dt(&backlight, 500, 250);
@@ -88,16 +88,16 @@ int main(void) {
         LOG_ERR("Failed to set PWM pulse, exiting...");
         return 0;
     }
-	LOG_DBG("PWM pulse for LCD backlight set.");
+    LOG_DBG("PWM pulse for LCD backlight set.");
 
     // Initialize the display device with initial GUI.
     display_init();
-	LOG_DBG("UI initialized.");
+    LOG_DBG("UI initialized.");
 
     // Start the UI work queue.
     k_work_queue_start(&ui_work_q, ui_stack_area, K_THREAD_STACK_SIZEOF(ui_stack_area),
     K_PRIO_PREEMPT(5), NULL);
-	LOG_DBG("UI work queue started.");
+    LOG_DBG("UI work queue started.");
 
     // Initialize the work items.
     k_work_init(&clock_update_work, clock_update_worker);
@@ -129,10 +129,10 @@ int main(void) {
     }
     LOG_DBG("Bluetooth subsystem is enabled.");
 
-	while (1) {
-		lv_task_handler();
+    while (1) {
+        lv_task_handler();
         k_sleep(K_MSEC(20)); // Increased sleep time to reduce system load
-	}
+    }
 }
 
 /* UPDATE_CLOCK_VIEW_CALLBACK
