@@ -1,6 +1,13 @@
 #ifndef _DISPLAY_STYLES_WIDGETSTYLE_H
 #define _DISPLAY_STYLES_WIDGETSTYLE_H
 
+/** Widget styling interface for LVGL components.
+ * Provides functions to initialize and access shared widget styles for consistent UI appearance across the smartwatch interface.
+ *
+ * @license GNU v3
+ * @maintainer electricalgorithm @ github
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif

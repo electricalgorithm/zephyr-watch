@@ -1,3 +1,10 @@
+/** Display utility functions implementation for creating LVGL UI components.
+ * Implements helper functions for creating screens, columns, and rows with proper styling, layout, and scrolling configuration.
+ *
+ * @license GNU v3
+ * @maintainer electricalgorithm @ github
+ */
+
 #include "lvgl.h"
 
 void remove_scrollable(lv_obj_t *obj) {

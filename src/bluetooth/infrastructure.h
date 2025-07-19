@@ -1,3 +1,10 @@
+/** Bluetooth Subsystem for ZephyrWatch
+ * This interface manages Bluetooth functionality, including advertising and connection handling.
+ *
+ * @license: GNU v3
+ * @maintainer: electricalgorithm @ github 
+ */
+
 #ifndef BLUETOOTH_INFRASTRUCTURE_H_
 #define BLUETOOTH_INFRASTRUCTURE_H_
 
@@ -9,8 +16,8 @@ extern "C" {
 #include <zephyr/bluetooth/gatt.h>
 #include <zephyr/logging/log.h>
 
-uint8_t enable_bluetooth_and_start_advertisement();
-uint8_t disable_bluetooth_and_stop_advertisement();
+uint8_t enable_bluetooth_subsystem();
+uint8_t disable_bluetooth_subsystem();
 
 #ifdef __cplusplus
 }

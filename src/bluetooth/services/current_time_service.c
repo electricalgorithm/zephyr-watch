@@ -1,13 +1,20 @@
+/** Current Time Service (CTS) implementation for handling time synchronization via Bluetooth GATT.
+ * This service allows devices to synchronize their time using the Current Time Service protocol.
+ *
+ * @license: GNU v3 
+ * @maintainer: electricalgorithm @ github
+ */
+
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/bluetooth/gatt.h>
 #include <string.h>
 
 #include "current_time_service.h"
-#include "timeutils/timeutils.h"
+#include "datetime/datetime.h"
 #include "devicetwin/devicetwin.h"
 
-LOG_MODULE_REGISTER(ZephyrWatch_CurrentTimeService, LOG_LEVEL_INF);
+LOG_MODULE_REGISTER(ZephyrWatch_BLE_CTS, LOG_LEVEL_INF);
 
 /* Current Time Service Write Callback */
 static ssize_t m_time_write_callback(
@@ -26,7 +33,7 @@ static ssize_t m_time_write_callback(
 
 	// Extract the UNIX timestamp from the buffer (assuming little-endian)
 	uint32_t unix_timestamp = sys_le32_to_cpu(*(uint32_t *)buf);
-	LOG_INF("Received UNIX timestamp: %u", unix_timestamp);
+	LOG_DBG("Received UNIX timestamp: %u", unix_timestamp);
 
 	// Get the device twin instance to get the UTC zone
 	device_twin_t *device_twin = get_device_twin_instance();
@@ -34,16 +41,11 @@ static ssize_t m_time_write_callback(
 		LOG_ERR("Failed to get device twin instance.");
 		return BT_GATT_ERR(BT_ATT_ERR_UNLIKELY);
 	}
+    device_twin->unix_time = unix_timestamp;
+    trigger_ui_update();
 
-	// Convert UNIX timestamp to local time using the device's UTC zone
-	utc_time_t local_time = unix_to_localtime(unix_timestamp, device_twin->utc_zone);
-
-	// Update the device twin's current time with local time
-	device_twin->current_time = local_time;
-	
-	// Update the global unix time used by the UI system
-	update_global_unix_time(unix_timestamp);
-
+    // Convert UNIX timestamp to local time using the device's UTC zone to print.
+	datetime_t local_time = unix_to_localtime(unix_timestamp, device_twin->utc_zone);
 	LOG_INF("Current time updated to local time: %04d-%02d-%02d %02d:%02d:%02d (UTC%+d)", 
 		local_time.year, local_time.month, local_time.day,
 		local_time.hour, local_time.minute, local_time.second,

@@ -1,8 +1,15 @@
+/** Bluetooth infrastructure for Zephyr-based devices.
+ * This file manages Bluetooth functionality, including advertising and connection handling.
+ *
+ * @license: GNU v3
+ * @maintainer: electricalgorithm @ github 
+ */
+
 #include <zephyr/settings/settings.h>
 #include <zephyr/bluetooth/gatt.h>
 #include <zephyr/logging/log.h>
 
-LOG_MODULE_REGISTER(ZephyrWatch_BluetoothInfra, LOG_LEVEL_INF);
+LOG_MODULE_REGISTER(ZephyrWatch_BLE, LOG_LEVEL_INF);
 
 static const struct bt_data m_ad[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
@@ -32,7 +39,7 @@ BT_CONN_CB_DEFINE(conn_callbacks) = {
 };
 
 /* The API function to enable Bluetooth and start advertisement. */
-uint8_t enable_bluetooth_and_start_advertisement() {
+uint8_t enable_bluetooth_subsystem() {
 	int err;
 	
     err = bt_enable(NULL);
@@ -57,7 +64,7 @@ uint8_t enable_bluetooth_and_start_advertisement() {
     return 0;
 }
 
-uint8_t disable_bluetooth_and_stop_advertisement() {
+uint8_t disable_bluetooth_subsystem() {
 	int err;
 
 	err = bt_le_adv_stop();
