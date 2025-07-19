@@ -8,7 +8,7 @@
 #ifndef _DEVICE_TWIN_H
 #define _DEVICE_TWIN_H
 
-#include <timeutils/timeutils.h>
+#include "datetime/datetime.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,14 +20,14 @@ extern "C" {
  * health monitoring, time, user settings, etc.
  */
 typedef struct {
-    utc_time_t current_time;
+    datetime_t current_time;
     int8_t utc_zone;
 } device_twin_t;
 
 /*
  * Function to construct a new device twin instance with given parameters.
  */
-device_twin_t* create_device_twin_instance(utc_time_t current_timei, int8_t utc_zone);
+device_twin_t* create_device_twin_instance(datetime_t current_timei, int8_t utc_zone);
 
 /*
  * Factory method to get the existing or newly constructed singleton device twin instance.

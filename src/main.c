@@ -24,16 +24,17 @@
 
 #include "display/display.h"
 #include "display/screens/home/home.h"
-#include "timeutils/timeutils.h"
 #include "devicetwin/devicetwin.h"
 #include "bluetooth/infrastructure.h"
 #include "bluetooth/services/current_time_service.h"
+
+#include "datetime/datetime.h"
 
 // Define the logger.
 LOG_MODULE_REGISTER(ZephyrWatch, LOG_LEVEL_INF);
 
 // Global values to hold time.
-uint32_t unix_time = 1748554674;
+extern uint32_t unix_time;
 int8_t utc_zone = +2;
 const char* weekdays[] = { "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT" };
 
@@ -53,28 +54,6 @@ static struct k_work date_day_update_work;
 // Define timers.
 // K_TIMER_DEFINE(unix_time_timer, update_unix_time_callback, NULL);
 K_TIMER_DEFINE(clock_view_timer, update_clock_view_callback, NULL);
-
-// Create an alarm for 1 second.
-#define ALARM_INTERVAL_US 1000000
-#define ALARM_CHANNEL_ID 0
-
-
-void rtc_counter_isr(
-    const struct device *dev,
-    uint8_t channel_id,
-    uint32_t ticks,
-    void *user_data)
-{
-    // Cast alarm config from user data.
-    struct counter_alarm_cfg *alarm_cfg = user_data;
-
-    // Reset alarm
-    alarm_cfg->ticks = counter_us_to_ticks(dev, ALARM_INTERVAL_US);
-    counter_set_channel_alarm(dev, ALARM_CHANNEL_ID, alarm_cfg);
-
-    // Update the second.
-    unix_time++;
-}
 
 
 int main(void) {
@@ -133,45 +112,22 @@ int main(void) {
     lv_task_handler();
     display_blanking_off(display_dev);
 
-    // Give the system more time to stabilize before initializing Bluetooth.
-    k_sleep(K_SECONDS(2));
+    ret = enable_datetime_subsystem();
+    if (ret) {
+        LOG_ERR("Datetime subsystem couldn't enabled. (RET: %d)", ret);
+        return ret;
+    }
+    LOG_DBG("Datetime subsystem is enabled.");
 
     // Initialize the Bluetooth stack.
+    // Give the system more time to stabilize before initializing Bluetooth.
+    k_sleep(K_SECONDS(2));
     ret = enable_bluetooth_and_start_advertisement();
     if (ret) {
-        LOG_ERR("Bluetooth init failed (ret %d).", ret);
+        LOG_ERR("Bluetooth subsystem couldn't enabled. (RET: %d)", ret);
         return ret;
     }
-    LOG_INF("Started to advertise with Bluetooth.");
-
-    // Set the real time counter to trigger an callback every second.
-    const struct device *real_time_counter = DEVICE_DT_GET(DT_NODELABEL(rtc_timer));
-    if (!device_is_ready(real_time_counter)) {
-        LOG_ERR("Real time counter device is not ready.");
-        return -ENODEV;
-    }
-    LOG_DBG("Real time counter device is ready.");
-
-    // Configure real time counter to track tine.
-    ret = counter_start(real_time_counter);
-    if (ret) {
-        LOG_ERR("Failed to start real time counter (ret %d).", ret);
-        return ret;
-    }
-    LOG_DBG("Real time counter started successfully.");
-
-    struct counter_alarm_cfg alarm_cfg = {
-        .flags = 0,
-        .ticks = counter_us_to_ticks(real_time_counter, ALARM_INTERVAL_US),
-        .callback = rtc_counter_isr,
-        .user_data = &alarm_cfg,
-    };
-    ret = counter_set_channel_alarm(real_time_counter, ALARM_CHANNEL_ID, &alarm_cfg);
-    if (ret) {
-        LOG_ERR("Failed to set channel alarm (ret %d).", ret);
-        return ret;
-    }
-    LOG_DBG("Channel alarm set successfully.");
+    LOG_DBG("Bluetooth subsystem is enabled.");
 
 	while (1) {
 		lv_task_handler();
@@ -218,7 +174,7 @@ void clock_update_worker(struct k_work *work) {
     device_twin_t* device_twin = get_device_twin_instance();
 
     // Construct the local time from UNIX time and save it.
-    utc_time_t local_time = unix_to_localtime(unix_time, device_twin->utc_zone);
+    datetime_t local_time = unix_to_localtime(unix_time, device_twin->utc_zone);
     device_twin->current_time = local_time;
 
     // Update the clock view using the device twin's current time.
@@ -244,7 +200,7 @@ void date_day_update_worker(struct k_work *work) {
     device_twin_t* device_twin = get_device_twin_instance();
 
     // Construct the local time from UNIX time and save it.
-    utc_time_t local_time = unix_to_localtime(unix_time, device_twin->utc_zone);
+    datetime_t local_time = unix_to_localtime(unix_time, device_twin->utc_zone);
     device_twin->current_time = local_time;
 
     // Update the date and day views using the device twin's current time.

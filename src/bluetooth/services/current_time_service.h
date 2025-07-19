@@ -15,7 +15,7 @@ extern "C" {
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/bluetooth/gatt.h>
-#include "timeutils/timeutils.h"
+#include "datetime/datetime.h"
 
 /* Function to update the global unix time - to be implemented in main.c */
 extern void update_global_unix_time(uint32_t unix_timestamp);

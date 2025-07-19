@@ -11,7 +11,7 @@
 #include <string.h>
 
 #include "current_time_service.h"
-#include "timeutils/timeutils.h"
+#include "datetime/datetime.h"
 #include "devicetwin/devicetwin.h"
 
 LOG_MODULE_REGISTER(ZephyrWatch_CurrentTimeService, LOG_LEVEL_INF);
@@ -43,7 +43,7 @@ static ssize_t m_time_write_callback(
 	}
 
 	// Convert UNIX timestamp to local time using the device's UTC zone
-	utc_time_t local_time = unix_to_localtime(unix_timestamp, device_twin->utc_zone);
+	datetime_t local_time = unix_to_localtime(unix_timestamp, device_twin->utc_zone);
 
 	// Update the device twin's current time with local time
 	device_twin->current_time = local_time;
