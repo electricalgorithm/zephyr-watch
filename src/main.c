@@ -82,9 +82,10 @@ int main(void) {
     k_work_submit_to_queue(&ui_work_q, &date_day_update_work);
     LOG_DBG("Timers are set.");
 
-    // Initialize LVGL first and let UI stabilize
-    lv_task_handler();
+    // Refresh the UI.
+    user_interface_task_handler();
 
+    // Enable datetime subsystem.
     ret = enable_datetime_subsystem();
     if (ret) {
         LOG_ERR("Datetime subsystem couldn't enabled. (RET: %d)", ret);
@@ -103,7 +104,7 @@ int main(void) {
     LOG_DBG("Bluetooth subsystem is enabled.");
 
     while (1) {
-        lv_task_handler();
+        user_interface_task_handler();
         k_sleep(K_MSEC(20)); // Increased sleep time to reduce system load
     }
 }

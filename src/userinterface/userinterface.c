@@ -10,6 +10,9 @@
 #include "userinterface/userinterface.h"
 
 
+/* USER_INTERFACE_INIT
+ * Set-up LVGLs home screen.
+ */
 void user_interface_init() {
     lv_disp_t *display = lv_disp_get_default();
     lv_theme_t *theme = lv_theme_default_init(
@@ -22,4 +25,11 @@ void user_interface_init() {
     lv_disp_set_theme(display, theme);
     home_screen_init();
     lv_disp_load_scr(home_screen);
+}
+
+/* USER_INTERFACE_TASK_HANDLER
+ * Call LVGLs task handler.
+ */
+void user_interface_task_handler() {
+    lv_task_handler();
 }

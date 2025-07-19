@@ -15,7 +15,11 @@ extern "C" {
 #include "lvgl.h"
 #include "userinterface/screens/home/home.h"
 
+/* Initilize the user interface. */
 void user_interface_init();
+
+/* Refresh/process the user interface jobs. */
+void user_interface_task_handler();
 
 #ifdef __cplusplus
 } // extern "C"
