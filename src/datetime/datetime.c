@@ -10,6 +10,7 @@
 #include <zephyr/device.h>
 #include <zephyr/drivers/counter.h>
 
+#include "devicetwin/devicetwin.h"
 #include "datetime/datetime.h"
 
 // Configuration for counter alarm.
@@ -55,8 +56,9 @@ void rtc_isr(const struct device *dev, uint8_t channel_id, uint32_t ticks, void 
         counter_set_channel_alarm(dev, ALARM_CHANNEL_ID, alarm_cfg);
     }
 
-    // Update the second.
-    unix_time++;
+    // Update device's current time.
+    device_twin_t *device_twin = get_device_twin_instance();
+    device_twin->unix_time = device_twin->unix_time + 1;
 }
 
 /* ENABLE_DATETIME_SUBSYSTEM

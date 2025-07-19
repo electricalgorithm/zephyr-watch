@@ -34,7 +34,6 @@
 LOG_MODULE_REGISTER(ZephyrWatch, LOG_LEVEL_INF);
 
 // Global values to hold time.
-extern uint32_t unix_time;
 int8_t utc_zone = +2;
 const char* weekdays[] = { "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT" };
 
@@ -60,7 +59,7 @@ int main(void) {
     int ret;
 
     // Create the device twin.
-    device_twin_t* device_twin = create_device_twin_instance(unix_to_localtime(unix_time, utc_zone), utc_zone);
+    device_twin_t* device_twin = create_device_twin_instance(0, utc_zone);
     if (!device_twin) {
         LOG_ERR("Cannot create device twin instance.");
         return 0;
@@ -144,15 +143,11 @@ void update_clock_view_callback(struct k_timer *timer) {
     k_work_submit_to_queue(&ui_work_q, &clock_update_work);
 }
 
-/* UPDATE_GLOBAL_UNIX_TIME
- * Function to update the global unix time from external sources
- * (like Bluetooth CTS). This function will be called by the external
- * sources.
+/* TRIGGER_UI_CHANGE
+ * Function to update the UI from external sources (like Bluetooth CTS).
+ * This function will be called by the external sources.
  */
-void update_global_unix_time(uint32_t unix_timestamp) {
-    unix_time = unix_timestamp;
-    LOG_INF("unix_time is updated to: %u", unix_time);
-
+void trigger_ui_update() {
     // Only submit if not already pending.
     if (!k_work_is_pending(&clock_update_work)) {
         k_work_submit_to_queue(&ui_work_q, &clock_update_work);
@@ -169,22 +164,21 @@ void update_global_unix_time(uint32_t unix_timestamp) {
  * calls the home screen set clock function.
  */
 void clock_update_worker(struct k_work *work) {
-    LOG_DBG("unix_time=%u", unix_time);
-    // Get the device twin to find UTC zone.
+    // Get the device twin to use the latest information..
     device_twin_t* device_twin = get_device_twin_instance();
+    LOG_DBG("Device's clock in UNIX epochs: %u", device_twin->unix_time);
 
     // Construct the local time from UNIX time and save it.
-    datetime_t local_time = unix_to_localtime(unix_time, device_twin->utc_zone);
-    device_twin->current_time = local_time;
+    datetime_t local_time = unix_to_localtime(device_twin->unix_time, device_twin->utc_zone);
 
     // Update the clock view using the device twin's current time.
-    uint8_t ret = home_screen_set_clock(device_twin->current_time.hour, device_twin->current_time.minute);
+    uint8_t ret = home_screen_set_clock(local_time.hour, local_time.minute);
     if (ret != 0) {
         LOG_ERR("Failed to update the clock view.");
     }
 
     // Send a date day update worker if 00:00.
-    if (device_twin->current_time.hour == 0 && device_twin->current_time.minute == 0) {
+    if (local_time.hour == 0 && local_time.minute == 0) {
         k_work_submit_to_queue(&ui_work_q, &date_day_update_work);
         LOG_DBG("Date and day update worker submitted to queue.");
     }
@@ -200,15 +194,14 @@ void date_day_update_worker(struct k_work *work) {
     device_twin_t* device_twin = get_device_twin_instance();
 
     // Construct the local time from UNIX time and save it.
-    datetime_t local_time = unix_to_localtime(unix_time, device_twin->utc_zone);
-    device_twin->current_time = local_time;
+    datetime_t local_time = unix_to_localtime(device_twin->unix_time, device_twin->utc_zone);
 
     // Update the date and day views using the device twin's current time.
-    uint8_t ret = home_screen_set_date(device_twin->current_time.year, device_twin->current_time.month, device_twin->current_time.day);
+    uint8_t ret = home_screen_set_date(local_time.year, local_time.month, local_time.day);
     if (ret != 0) {
         LOG_ERR("Failed to update the date view.");
     }
-    ret = home_screen_set_day(weekdays[device_twin->current_time.weekday]);
+    ret = home_screen_set_day(weekdays[local_time.weekday]);
     if (ret != 0) {
         LOG_ERR("Failed to update the day view.");
     }

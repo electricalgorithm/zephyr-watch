@@ -17,8 +17,8 @@ extern "C" {
 #include <zephyr/bluetooth/gatt.h>
 #include "datetime/datetime.h"
 
-/* Function to update the global unix time - to be implemented in main.c */
-extern void update_global_unix_time(uint32_t unix_timestamp);
+/* A function to trigger UI updates - to be implemented in main.c */
+extern void trigger_ui_update();
 
 #ifdef __cplusplus
 }
