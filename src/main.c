@@ -22,8 +22,7 @@
 #include <zephyr/bluetooth/bluetooth.h>
 #include <zephyr/drivers/counter.h>
 
-#include "display/display.h"
-#include "display/screens/home/home.h"
+#include "userinterface/userinterface.h"
 #include "devicetwin/devicetwin.h"
 #include "bluetooth/infrastructure.h"
 #include "bluetooth/services/current_time_service.h"
@@ -88,14 +87,14 @@ int main(void) {
     }
     LOG_DBG("PWM pulse for LCD backlight set.");
 
-    // Initialize the display device with initial GUI.
-    display_init();
-    LOG_DBG("UI initialized.");
+    // Initialize the display device with initial user interface.
+    user_interface_init();
+    LOG_DBG("User interface initialized.");
 
     // Start the UI work queue.
     k_work_queue_start(&ui_work_q, ui_stack_area, K_THREAD_STACK_SIZEOF(ui_stack_area),
-    K_PRIO_PREEMPT(5), NULL);
-    LOG_DBG("UI work queue started.");
+                       K_PRIO_PREEMPT(5), NULL);
+    LOG_DBG("User interface work queue started.");
 
     // Initialize the work items.
     k_work_init(&clock_update_work, clock_update_worker);

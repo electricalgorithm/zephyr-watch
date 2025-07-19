@@ -1,5 +1,6 @@
 /** Display initialization interface for LVGL-based UI setup.
- * Provides functions to initialize the display system and set up the default theme for the smartwatch interface.
+ * Provides functions to initialize the display system and set up the default theme for the
+ * smartwatch interface.
  *
  * @license GNU v3
  * @maintainer electricalgorithm @ github
@@ -13,9 +14,9 @@ extern "C" {
 #endif
 
 #include "lvgl.h"
-#include "display/screens/home/home.h"
+#include "userinterface/screens/home/home.h"
 
-void display_init();
+void user_interface_init();
 
 #ifdef __cplusplus
 } // extern "C"

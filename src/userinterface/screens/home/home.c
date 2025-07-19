@@ -1,13 +1,14 @@
-/** Home screen implementation for the main smartwatch display.
- * Implements the home screen UI with clock, date, and day display components using LVGL widgets and styling.
+/** Home screen implementation for the main smartwatch userinterface.
+ * Implements the home screen UI with clock, date, and day display components using LVGL widgets and
+ * styling.
  *
  * @license GNU v3
  * @maintainer electricalgorithm @ github
  */
 
 #include "lvgl.h"
-#include "display/display.h"
-#include "display/utils.h"
+#include "userinterface/userinterface.h"
+#include "userinterface/utils.h"
 
 /* Names of the Weekdays */
 static const char* weekdays[] = { "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT" };

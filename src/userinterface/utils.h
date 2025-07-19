@@ -1,12 +1,13 @@
 /** Display utility functions for creating LVGL UI components.
- * Provides helper functions for creating screens, columns, and rows with proper styling and layout configuration.
+ * Provides helper functions for creating screens, columns, and rows with proper styling and layout
+ * configuration.
  *
  * @license GNU v3
  * @maintainer electricalgorithm @ github
  */
 
-#ifndef _DISPLAY_UTILS_H
-#define _DISPLAY_UTILS_H
+#ifndef _UI_UTILS_H
+#define _UI_UTILS_H
 
 #ifdef __cplusplus
 extern "C" {

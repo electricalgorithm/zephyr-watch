@@ -1,15 +1,16 @@
 /** Display initialization implementation for LVGL-based UI setup.
- * Implements display system initialization, theme configuration, and home screen loading for the smartwatch interface.
+ * Implements display system initialization, theme configuration, and home screen loading for the
+ * smartwatch interface.
  *
  * @license GNU v3
  * @maintainer electricalgorithm @ github
  */
 
 #include "lvgl.h"
-#include "display/display.h"
+#include "userinterface/userinterface.h"
 
 
-void display_init() {
+void user_interface_init() {
     lv_disp_t *display = lv_disp_get_default();
     lv_theme_t *theme = lv_theme_default_init(
         display,

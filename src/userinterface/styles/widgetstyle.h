@@ -1,8 +1,9 @@
-#ifndef _DISPLAY_STYLES_WIDGETSTYLE_H
-#define _DISPLAY_STYLES_WIDGETSTYLE_H
+#ifndef _UI_STYLES_WIDGETSTYLE_H
+#define _UI_STYLES_WIDGETSTYLE_H
 
 /** Widget styling interface for LVGL components.
- * Provides functions to initialize and access shared widget styles for consistent UI appearance across the smartwatch interface.
+ * Provides functions to initialize and access shared widget styles for consistent UI appearance
+ * across the smartwatch interface.
  *
  * @license GNU v3
  * @maintainer electricalgorithm @ github
@@ -24,4 +25,4 @@ const lv_style_t* get_widget_style_no_border();
 }
 #endif
 
-#endif // _DISPLAY_STYLES_WIDGETSTYLE_H
+#endif // _UI_STYLES_WIDGETSTYLE_H
