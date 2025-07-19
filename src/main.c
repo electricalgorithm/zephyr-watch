@@ -13,14 +13,13 @@
 #include <zephyr/devicetree.h>
 #include <zephyr/logging/log.h>
 
-#include <zephyr/drivers/display.h>
 #include <zephyr/drivers/gpio.h>
-#include <zephyr/drivers/pwm.h>
 
-#include "userinterface/userinterface.h"
+#include "display/display.h"
 #include "devicetwin/devicetwin.h"
-#include "bluetooth/infrastructure.h"
+#include "userinterface/userinterface.h"
 #include "datetime/datetime.h"
+#include "bluetooth/infrastructure.h"
 
 // Define the logger.
 LOG_MODULE_REGISTER(ZephyrWatch, LOG_LEVEL_INF);
@@ -57,32 +56,17 @@ int main(void) {
     }
     LOG_DBG("Device twin instance created successfully.");
 
-    // Check if the display device is ready.
-    const struct device *display_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
-    if (!device_is_ready(display_dev)) {
-        LOG_ERR("Display device is not ready, exiting...");
-        return 0;
+    // Init the display subsystem.
+    ret = enable_display_subsystem();
+    if (ret) {
+        LOG_ERR("Display subsystem couldn't enabled. (RET: %d)", ret);
+        return ret;
     }
-    LOG_DBG("Display device is ready.");
-
-    const struct pwm_dt_spec backlight = PWM_DT_SPEC_GET_BY_IDX(DT_NODELABEL(pwm_lcd0), 0);
-    if (!pwm_is_ready_dt(&backlight)) {
-        LOG_ERR("PWM device is not ready, exiting...");
-        return 0;
-    }
-    LOG_DBG("PWM device is ready.");
-
-    // Initialize the PWM device.
-    ret = pwm_set_dt(&backlight, 500, 250);
-    if (ret < 0) {
-        LOG_ERR("Failed to set PWM pulse, exiting...");
-        return 0;
-    }
-    LOG_DBG("PWM pulse for LCD backlight set.");
+    LOG_DBG("Display subsystem is enabled.");
 
     // Initialize the display device with initial user interface.
     user_interface_init();
-    LOG_DBG("User interface initialized.");
+    LOG_DBG("User interface subsystem is enabled.");
 
     // Start the UI work queue.
     k_work_queue_start(&ui_work_q, ui_stack_area, K_THREAD_STACK_SIZEOF(ui_stack_area),
@@ -100,7 +84,6 @@ int main(void) {
 
     // Initialize LVGL first and let UI stabilize
     lv_task_handler();
-    display_blanking_off(display_dev);
 
     ret = enable_datetime_subsystem();
     if (ret) {
