@@ -30,4 +30,3 @@ void widget_style_init() {
 const lv_style_t* get_widget_style_no_border() {
     return &style_no_border;
 }
-
