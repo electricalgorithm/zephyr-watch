@@ -1,5 +1,5 @@
-/** Bluetooth infrastructure for Zephyr-based devices.
- * This file manages Bluetooth functionality, including advertising and connection handling.
+/** Bluetooth Subsystem for ZephyrWatch
+ * This interface manages Bluetooth functionality, including advertising and connection handling.
  *
  * @license: GNU v3
  * @maintainer: electricalgorithm @ github 

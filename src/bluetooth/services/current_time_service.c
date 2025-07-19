@@ -14,7 +14,7 @@
 #include "datetime/datetime.h"
 #include "devicetwin/devicetwin.h"
 
-LOG_MODULE_REGISTER(ZephyrWatch_CurrentTimeService, LOG_LEVEL_INF);
+LOG_MODULE_REGISTER(ZephyrWatch_BLE_CTS, LOG_LEVEL_INF);
 
 /* Current Time Service Write Callback */
 static ssize_t m_time_write_callback(

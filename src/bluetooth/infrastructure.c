@@ -9,7 +9,7 @@
 #include <zephyr/bluetooth/gatt.h>
 #include <zephyr/logging/log.h>
 
-LOG_MODULE_REGISTER(ZephyrWatch_BluetoothInfra, LOG_LEVEL_INF);
+LOG_MODULE_REGISTER(ZephyrWatch_BLE, LOG_LEVEL_INF);
 
 static const struct bt_data m_ad[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
