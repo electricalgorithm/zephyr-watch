@@ -121,7 +121,7 @@ int main(void) {
     // Initialize the Bluetooth stack.
     // Give the system more time to stabilize before initializing Bluetooth.
     k_sleep(K_SECONDS(2));
-    ret = enable_bluetooth_and_start_advertisement();
+    ret = enable_bluetooth_subsystem();
     if (ret) {
         LOG_ERR("Bluetooth subsystem couldn't enabled. (RET: %d)", ret);
         return ret;
