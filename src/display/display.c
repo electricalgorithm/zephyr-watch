@@ -14,8 +14,8 @@
 LOG_MODULE_REGISTER(ZephyrWatch_Display, LOG_LEVEL_INF);
 
 // Get devices from the device tree.
-#define DISPLAY_DEVICE DT_CHOSEN(zephyr_display)
-#define DISPLAY_PWM_DEVICE DT_NODELABEL(pwm_lcd0)
+#define DISPLAY_DEVICE DT_ALIAS(lcddisplaydevice)
+#define DISPLAY_PWM_DEVICE DT_ALIAS(lcdpwmdevice)
 
 /* ENABLE_DISPLAY_SUBSYSTEM
  * Set the Zephyr display device and set backlight.

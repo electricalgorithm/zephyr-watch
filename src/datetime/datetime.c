@@ -13,6 +13,9 @@
 #include "devicetwin/devicetwin.h"
 #include "datetime/datetime.h"
 
+// Get devices from the device tree.
+#define RTC_COUNTER_DEVICE DT_ALIAS(rtccounterdevice)
+
 // Configuration for counter alarm.
 #define ALARM_INTERVAL_US 1000000
 #define ALARM_CHANNEL_ID 0
@@ -65,7 +68,7 @@ int enable_datetime_subsystem() {
     int ret;
 
     // Set the real time counter to trigger an callback every second.
-    const struct device *real_time_counter = DEVICE_DT_GET(DT_NODELABEL(rtc_timer));
+    const struct device *real_time_counter = DEVICE_DT_GET(RTC_COUNTER_DEVICE);
     if (!device_is_ready(real_time_counter)) {
         LOG_ERR("Real time counter device is not ready.");
         return -ENODEV;
@@ -103,7 +106,7 @@ int disable_datetime_subsystem() {
     int ret;
 
     // Set the real time counter to trigger an callback every second.
-    const struct device *real_time_counter = DEVICE_DT_GET(DT_NODELABEL(rtc_timer));
+    const struct device *real_time_counter = DEVICE_DT_GET(RTC_COUNTER_DEVICE);
     if (!device_is_ready(real_time_counter)) {
         LOG_ERR("Real time counter device is not ready.");
         return -ENODEV;

@@ -1,5 +1,9 @@
-&timer0 {
-    status = "okay";
+/ {
+    aliases {
+        rtccounterdevice = &rtc_timer;
+        lcddisplaydevice = &gc9a01;
+        lcdpwmdevice = &pwm_lcd0;
+    };
 };
 
 &rtc_timer {
