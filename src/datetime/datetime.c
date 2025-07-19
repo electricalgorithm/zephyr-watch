@@ -20,9 +20,6 @@
 /* Register a logger for this library. */
 LOG_MODULE_REGISTER(ZephyrWatch_Datetime, LOG_LEVEL_INF);
 
-/* Global unix_time variable to store datetime. */
-uint32_t unix_time = 1748554674;
-
 /* Disable flag to not set alarm again in ISR.
  * 0: Set alarm again.
  * !: Do not set alarm again.
@@ -57,8 +54,7 @@ void rtc_isr(const struct device *dev, uint8_t channel_id, uint32_t ticks, void 
     }
 
     // Update device's current time.
-    device_twin_t *device_twin = get_device_twin_instance();
-    device_twin->unix_time = device_twin->unix_time + 1;
+    set_current_unix_time(get_current_unix_time() + 1);
 }
 
 /* ENABLE_DATETIME_SUBSYSTEM
@@ -133,14 +129,16 @@ int disable_datetime_subsystem() {
  * Return the UNIX epochs of the current time.
  */
 uint32_t get_current_unix_time() {
-    return unix_time;
+    device_twin_t *device_twin = get_device_twin_instance();
+    return device_twin->unix_time;
 }
 
 /* SET_CURRENT_UNIX_TIME
  * Set the current time with UNIX epoch.
  */
 int set_current_unix_time(uint32_t new_time) {
-    unix_time = new_time;
+    device_twin_t *device_twin = get_device_twin_instance();
+    device_twin->unix_time = new_time;
     return 0;
 }
 
@@ -148,7 +146,7 @@ int set_current_unix_time(uint32_t new_time) {
  * Return the current time in datetime_t object in local time zone.
  */
 datetime_t get_current_local_time(int8_t utc_offset_hours) {
-    return unix_to_localtime(unix_time, utc_offset_hours);
+    return unix_to_localtime(get_current_unix_time(), utc_offset_hours);
 }
 
 /* UNIX_TO_LOCALTIME
