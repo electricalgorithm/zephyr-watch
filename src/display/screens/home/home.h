@@ -29,7 +29,7 @@ void render_day_label(lv_obj_t *flex_element);
 // Set the values on the home-screen. Returns 0 if successful, 1 otherwise.
 uint8_t home_screen_set_clock(uint8_t hour, uint8_t minute);
 uint8_t home_screen_set_date(uint16_t year, uint8_t month, uint8_t day);
-uint8_t home_screen_set_day(const char* day);
+uint8_t home_screen_set_day(uint8_t day_no);
 
 #ifdef __cplusplus
 } // extern "C"

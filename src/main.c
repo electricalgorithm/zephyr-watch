@@ -33,9 +33,8 @@
 // Define the logger.
 LOG_MODULE_REGISTER(ZephyrWatch, LOG_LEVEL_INF);
 
-// Global values to hold time.
+// Setting for device's time zone.
 int8_t utc_zone = +2;
-const char* weekdays[] = { "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT" };
 
 // Define the timer callbacks' prototypes.
 void update_clock_view_callback(struct k_timer *timer);
@@ -201,7 +200,7 @@ void date_day_update_worker(struct k_work *work) {
     if (ret != 0) {
         LOG_ERR("Failed to update the date view.");
     }
-    ret = home_screen_set_day(weekdays[local_time.weekday]);
+    ret = home_screen_set_day(local_time.weekday);
     if (ret != 0) {
         LOG_ERR("Failed to update the day view.");
     }

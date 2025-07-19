@@ -9,6 +9,9 @@
 #include "display/display.h"
 #include "display/utils.h"
 
+/* Names of the Weekdays */
+static const char* weekdays[] = { "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT" };
+
 // Holds the home screen object.
 lv_obj_t *home_screen;
 lv_obj_t *label_clock;
@@ -87,11 +90,11 @@ uint8_t home_screen_set_date(uint16_t year, uint8_t month, uint8_t day) {
     return 0;
 }
 
-uint8_t home_screen_set_day(const char* day) {
+uint8_t home_screen_set_day(uint8_t day_no) {
     // Check if the label_clock is NULL.
     if (label_day == NULL) return 1;
     // Set the text of the label_day to the 3 character day name.
-    lv_label_set_text(label_day, day);
+    lv_label_set_text(label_day, weekdays[day_no]);
     // Update the display.
     lv_disp_flush_ready(lv_disp_get_default());
     return 0;
