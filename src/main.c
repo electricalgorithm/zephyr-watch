@@ -8,9 +8,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <lvgl.h>
-#include <lvgl_input_device.h>
-
 #include <zephyr/kernel.h>
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
@@ -19,14 +16,10 @@
 #include <zephyr/drivers/display.h>
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/pwm.h>
-#include <zephyr/bluetooth/bluetooth.h>
-#include <zephyr/drivers/counter.h>
 
 #include "userinterface/userinterface.h"
 #include "devicetwin/devicetwin.h"
 #include "bluetooth/infrastructure.h"
-#include "bluetooth/services/current_time_service.h"
-
 #include "datetime/datetime.h"
 
 // Define the logger.
