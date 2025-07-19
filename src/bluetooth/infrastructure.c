@@ -39,7 +39,7 @@ BT_CONN_CB_DEFINE(conn_callbacks) = {
 };
 
 /* The API function to enable Bluetooth and start advertisement. */
-uint8_t enable_bluetooth_and_start_advertisement() {
+uint8_t enable_bluetooth_subsystem() {
 	int err;
 	
     err = bt_enable(NULL);
@@ -64,7 +64,7 @@ uint8_t enable_bluetooth_and_start_advertisement() {
     return 0;
 }
 
-uint8_t disable_bluetooth_and_stop_advertisement() {
+uint8_t disable_bluetooth_subsystem() {
 	int err;
 
 	err = bt_le_adv_stop();
