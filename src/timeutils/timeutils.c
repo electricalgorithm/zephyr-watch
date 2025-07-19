@@ -1,3 +1,10 @@
+/** Time utility functions implementation for Unix timestamp conversion.
+ * Implements conversion algorithms for Unix timestamps to UTC and local time including leap year calculations and weekday determination.
+ *
+ * @license GNU v3
+ * @maintainer electricalgorithm @ github
+ */
+
 #include "timeutils/timeutils.h"
 
 static const uint16_t days_in_month[] = {

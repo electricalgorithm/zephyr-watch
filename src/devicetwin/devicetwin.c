@@ -1,3 +1,9 @@
+/** Device Twin implementation for managing synchronized device state.
+ *
+ * @license: GNU v3
+ * @maintainer: electricalgorithm @ github 
+ */
+
 #include <stdlib.h>
 #include "devicetwin/devicetwin.h"
 

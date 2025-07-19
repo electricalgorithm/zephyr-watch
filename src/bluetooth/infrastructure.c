@@ -1,3 +1,10 @@
+/** Bluetooth infrastructure for Zephyr-based devices.
+ * This file manages Bluetooth functionality, including advertising and connection handling.
+ *
+ * @license: GNU v3
+ * @maintainer: electricalgorithm @ github 
+ */
+
 #include <zephyr/settings/settings.h>
 #include <zephyr/bluetooth/gatt.h>
 #include <zephyr/logging/log.h>

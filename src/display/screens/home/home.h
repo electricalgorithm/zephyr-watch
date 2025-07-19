@@ -1,3 +1,10 @@
+/** Home screen interface for the main smartwatch display.
+ * Provides functions to initialize and manage the home screen UI including clock, date, and day display components.
+ *
+ * @license GNU v3
+ * @maintainer electricalgorithm @ github
+ */
+
 #ifndef _SCREENS_HOME_HOME_H
 #define _SCREENS_HOME_HOME_H
 

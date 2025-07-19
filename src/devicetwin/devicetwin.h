@@ -1,3 +1,10 @@
+/** Device Twin interface for managing synchronized device state.
+ *
+ * @license: GNU v3
+ * @maintainer: electricalgorithm @ github 
+ */
+
+
 #ifndef _DEVICE_TWIN_H
 #define _DEVICE_TWIN_H
 

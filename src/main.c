@@ -1,3 +1,10 @@
+/** Main application entry point for Zephyr-based smartwatch firmware.
+ * Initializes display, Bluetooth, timers, and manages the core watch functionality including time tracking and UI updates.
+ *
+ * @license GNU v3
+ * @maintainer electricalgorithm @ github
+ */
+
 #include <stdio.h>
 #include <string.h>
 
@@ -54,7 +61,7 @@ K_TIMER_DEFINE(clock_view_timer, update_clock_view_callback, NULL);
 
 void rtc_counter_isr(
     const struct device *dev,
-    uint8_t channel_id, 
+    uint8_t channel_id,
     uint32_t ticks,
     void *user_data)
 {
@@ -64,7 +71,7 @@ void rtc_counter_isr(
     // Reset alarm
     alarm_cfg->ticks = counter_us_to_ticks(dev, ALARM_INTERVAL_US);
     counter_set_channel_alarm(dev, ALARM_CHANNEL_ID, alarm_cfg);
-    
+
     // Update the second.
     unix_time++;
 }
@@ -109,7 +116,7 @@ int main(void) {
 	LOG_DBG("UI initialized.");
 
     // Start the UI work queue.
-    k_work_queue_start(&ui_work_q, ui_stack_area, K_THREAD_STACK_SIZEOF(ui_stack_area), 
+    k_work_queue_start(&ui_work_q, ui_stack_area, K_THREAD_STACK_SIZEOF(ui_stack_area),
     K_PRIO_PREEMPT(5), NULL);
 	LOG_DBG("UI work queue started.");
 

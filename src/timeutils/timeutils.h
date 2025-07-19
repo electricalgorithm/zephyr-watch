@@ -1,3 +1,10 @@
+/** Time utility functions interface for Unix timestamp conversion.
+ * Provides data structures and functions for converting Unix timestamps to UTC and local time with timezone support.
+ *
+ * @license GNU v3
+ * @maintainer electricalgorithm @ github
+ */
+
 #ifndef TIMEUTILS_H
 #define TIMEUTILS_H
 

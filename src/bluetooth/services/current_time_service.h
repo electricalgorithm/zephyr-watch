@@ -1,3 +1,10 @@
+/** Current Time Service (CTS) interface for handling time synchronization via Bluetooth GATT.
+ * This service allows devices to synchronize their time using the Current Time Service protocol.
+ *
+ * @license: GNU v3 
+ * @maintainer: electricalgorithm @ github
+ */
+
 #ifndef CURRENT_TIME_SERVICE_H
 #define CURRENT_TIME_SERVICE_H
 

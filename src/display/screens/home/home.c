@@ -1,3 +1,10 @@
+/** Home screen implementation for the main smartwatch display.
+ * Implements the home screen UI with clock, date, and day display components using LVGL widgets and styling.
+ *
+ * @license GNU v3
+ * @maintainer electricalgorithm @ github
+ */
+
 #include "lvgl.h"
 #include "display/display.h"
 #include "display/utils.h"
@@ -26,7 +33,7 @@ void home_screen_init() {
     render_clock_label(clock_label_row);
     render_date_label(date_day_row);
     render_day_label(date_day_row);
-    
+
     // Add an event handler for all possible events.
     lv_obj_add_event_cb(home_screen, home_screen_event, LV_EVENT_ALL, NULL);
 }

@@ -1,3 +1,10 @@
+/** Current Time Service (CTS) implementation for handling time synchronization via Bluetooth GATT.
+ * This service allows devices to synchronize their time using the Current Time Service protocol.
+ *
+ * @license: GNU v3 
+ * @maintainer: electricalgorithm @ github
+ */
+
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/bluetooth/gatt.h>

@@ -1,3 +1,10 @@
+/** Bluetooth infrastructure for Zephyr-based devices.
+ * This file manages Bluetooth functionality, including advertising and connection handling.
+ *
+ * @license: GNU v3
+ * @maintainer: electricalgorithm @ github 
+ */
+
 #ifndef BLUETOOTH_INFRASTRUCTURE_H_
 #define BLUETOOTH_INFRASTRUCTURE_H_
 
