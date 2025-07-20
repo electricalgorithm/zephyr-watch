@@ -39,8 +39,18 @@ static const uint16_t days_in_month[] = {
 };
 static bool is_leap_year(uint16_t year);
 static uint8_t calc_weekday(uint32_t days_since_epoch);
-// static datetime_t unix_to_localtime(int32_t timestamp, int8_t utc_offset_hours);
-// static datetime_t unix_to_utc(uint32_t timestamp);
+
+/* Since our board's RTC is not an real-time clock but a real-time counter,
+ * we do get a drift in the time as 4 minutes per hour. It means 0.06 seconds drift per each second,
+ * and we need to resolve it as much as we can. Within this drift code, we aim to add extra 1 second
+ * (DRIFT_CORRECTION_SECONDS) for each 15 seconds (DRIFT_DETECTION_SECONDS).
+ *
+ * We store the last time we applied drift to last_drift variable and check if 60 seconds passed
+ * in each RTC ISR call. When drift is applied, we update the last_drift to wait the next 60 secs.
+ */
+#define DRIFT_DETECTION_SECONDS 15
+#define DRIFT_CORRECTION_SECONDS 1
+static uint32_t last_drift = 0;
 
 /* RTC_ISR
  * Interrupt service routine for alarm with real-time counters.  This ISR is executed every
@@ -56,8 +66,18 @@ void rtc_isr(const struct device *dev, uint8_t channel_id, uint32_t ticks, void 
         counter_set_channel_alarm(dev, ALARM_CHANNEL_ID, alarm_cfg);
     }
 
-    // Update device's current time.
-    set_current_unix_time(get_current_unix_time() + 1);
+    // Get device's current time.
+    uint32_t current_unix_time = get_current_unix_time();
+    uint8_t update_amount = 1;  // Always +1 since ISR called every second.
+
+    // Apply a manual drift correction to the time.
+    if (current_unix_time - last_drift >= DRIFT_DETECTION_SECONDS) {
+        update_amount += DRIFT_CORRECTION_SECONDS;
+        last_drift = current_unix_time + update_amount;
+    }
+
+    // Update the system time.
+    set_current_unix_time(current_unix_time + update_amount);
 }
 
 /* ENABLE_DATETIME_SUBSYSTEM
@@ -140,6 +160,7 @@ uint32_t get_current_unix_time() {
  * Set the current time with UNIX epoch.
  */
 int set_current_unix_time(uint32_t new_time) {
+    // Update the system time.
     device_twin_t *device_twin = get_device_twin_instance();
     device_twin->unix_time = new_time;
     return 0;
