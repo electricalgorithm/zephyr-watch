@@ -7,7 +7,9 @@ an open-source smartwatch based on lvgl, zephyr and ble
 
 <div align="center">
 
-![version](https://img.shields.io/github/package-json/v/electricalgorithm/zephyr-watch?logoColor=blue&style=flat-square) ![](https://img.shields.io/badge/license-GNUv3-critical?style=flat-square) ![stars](https://img.shields.io/github/stars/electricalgorithm/zephyr-watch?style=flat-square) ![GitHub branch check runs](https://img.shields.io/github/check-runs/electricalgorithm/zephyr-watch/main?style=flat-square)
+![version](https://img.shields.io/github/v/release/electricalgorithm/zephyr-watch?include_prereleases&sort=date&display_name=release&style=flat-square) ![](https://img.shields.io/badge/license-GNUv3-critical?style=flat-square) ![stars](https://img.shields.io/github/stars/electricalgorithm/zephyr-watch?style=flat-square) ![GitHub milestone details](https://img.shields.io/github/milestones/progress-percent/electricalgorithm/zephyr-watch/2?style=flat-square&color=%23ffcc01)
+
+
 
 ---
 
