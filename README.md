@@ -20,6 +20,7 @@ an open-source smartwatch based on lvgl, zephyr and ble
 - LVGL for UI and Graphics Rendering
 - BLE Current Time Service (GATT) for Time Synchronization
 - BLE Device Information Service (DIS) for Device Metadata
+- Watchdog to Handle Unexpected Failures
 
 ### Supported Boards
 - [ESP32-S3-Touch-LCD-1.28](https://www.waveshare.com/wiki/ESP32-S3-Touch-LCD-1.28)
