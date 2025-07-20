@@ -3,6 +3,7 @@
         rtccounterdevice = &rtc_timer;
         lcddisplaydevice = &gc9a01;
         lcdpwmdevice = &pwm_lcd0;
+        watchdogdevice = &wdt0;
     };
 };
 
