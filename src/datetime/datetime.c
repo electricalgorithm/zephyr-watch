@@ -42,14 +42,14 @@ static uint8_t calc_weekday(uint32_t days_since_epoch);
 
 /* Since our board's RTC is not an real-time clock but a real-time counter,
  * we do get a drift in the time as 4 minutes per hour. It means 0.06 seconds drift per each second,
- * and we need to resolve it as much as we can. Within this drift code, we aim to add extra 4 secs
- * (DRIFT_CORRECTION_SECONDS) for each minute (DRIFT_DETECTION_SECONDS).
+ * and we need to resolve it as much as we can. Within this drift code, we aim to add extra 1 second
+ * (DRIFT_CORRECTION_SECONDS) for each 15 seconds (DRIFT_DETECTION_SECONDS).
  *
  * We store the last time we applied drift to last_drift variable and check if 60 seconds passed
  * in each RTC ISR call. When drift is applied, we update the last_drift to wait the next 60 secs.
  */
-#define DRIFT_DETECTION_SECONDS 60
-#define DRIFT_CORRECTION_SECONDS 4
+#define DRIFT_DETECTION_SECONDS 15
+#define DRIFT_CORRECTION_SECONDS 1
 static uint32_t last_drift = 0;
 
 /* RTC_ISR
@@ -163,8 +163,6 @@ int set_current_unix_time(uint32_t new_time) {
     // Update the system time.
     device_twin_t *device_twin = get_device_twin_instance();
     device_twin->unix_time = new_time;
-    // Update the drift detections' last drift time.
-    last_drift = new_time;
     return 0;
 }
 
