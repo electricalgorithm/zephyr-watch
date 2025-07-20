@@ -54,7 +54,7 @@ uint8_t enable_bluetooth_subsystem() {
         settings_load();
     }
 
-    err = bt_le_adv_start(BT_LE_ADV_CONN, m_ad, ARRAY_SIZE(m_ad), m_sd, ARRAY_SIZE(m_sd));
+    err = bt_le_adv_start(BT_LE_ADV_CONN_FAST_1, m_ad, ARRAY_SIZE(m_ad), m_sd, ARRAY_SIZE(m_sd));
     if (err) {
         LOG_ERR("Advertising failed to start (err %d).", err);
         return err;
