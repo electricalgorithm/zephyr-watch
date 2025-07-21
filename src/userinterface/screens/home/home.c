@@ -9,6 +9,7 @@
 #include "lvgl.h"
 #include "userinterface/userinterface.h"
 #include "userinterface/utils.h"
+#include "userinterface/screens/menu/menu.h"
 
 /* Names of the Weekdays */
 static const char* weekdays[] = { "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT" };
@@ -42,8 +43,23 @@ void home_screen_init() {
     lv_obj_add_event_cb(home_screen, home_screen_event, LV_EVENT_ALL, NULL);
 }
 
-void home_screen_event(lv_event_t * e) {
-    // lv_event_code_t event_code = lv_event_get_code(e);lv_obj_t * target = lv_event_get_target(e);
+void home_screen_event(lv_event_t * event) {
+    lv_event_code_t event_code = lv_event_get_code(event);
+
+    // Handle gesture events using the callback
+    if (event_code == LV_EVENT_GESTURE) {
+        lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_active());
+
+        // Check for bottom-to-top gesture to open menu.
+        if (dir == LV_DIR_TOP) {
+            // Initialize menu screen if not already done.
+            if (!lv_obj_is_valid(menu_screen)) {
+                menu_screen_init();
+            }
+            // Create a smooth slide transition from right to left
+            lv_screen_load_anim(menu_screen, LV_SCR_LOAD_ANIM_MOVE_TOP, 300, 0, false);
+        }
+    }
 }
 
 void render_clock_label(lv_obj_t *flex_element) {
