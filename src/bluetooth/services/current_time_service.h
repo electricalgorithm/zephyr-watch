@@ -15,7 +15,6 @@ extern "C" {
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/bluetooth/gatt.h>
-#include "datetime/datetime.h"
 
 /* A function to trigger UI updates - to be implemented in main.c */
 extern void trigger_ui_update();
