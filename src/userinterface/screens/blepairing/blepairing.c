@@ -10,11 +10,10 @@
 #include <string.h>
 #include "lvgl.h"
 #include "userinterface/utils.h"
-#include "userinterface/screens/home/home.h"
 #include "userinterface/screens/blepairing/blepairing.h"
 
 // Create a logger.
-LOG_MODULE_REGISTER(ZephyrWatch_UI_BLEPairing, LOG_LEVEL_DBG);
+LOG_MODULE_REGISTER(ZephyrWatch_UI_BLEPairing, LOG_LEVEL_INF);
 
 // Forward declarations for static functions
 static void render_title_label(lv_obj_t *flex_element);
@@ -24,6 +23,7 @@ static void render_footer_label(lv_obj_t *flex_element);
 
 // Holds the BLE pairing screen objects.
 lv_obj_t *blepairing_screen;
+lv_obj_t *previous_screen;
 static lv_obj_t *label_title;
 static lv_obj_t *label_instruction;
 static lv_obj_t *pin_container;
@@ -31,19 +31,15 @@ static lv_obj_t *pin_digits[6];  // Array to hold individual PIN digit labels
 static lv_obj_t *label_footer;
 
 // Current PIN code (default for demonstration)
-static char current_pin[7] = "123456";
+static char current_pin[7] = "000000";
 
 void blepairing_screen_event(lv_event_t * event) {
     lv_event_code_t event_code = lv_event_get_code(event);
-    LOG_DBG("Event code: %d", event_code);
 
     // Handle double click to return to home.
     if (event_code == LV_EVENT_DOUBLE_CLICKED) {
-        LOG_DBG("Double click detected: returning to home screen.");
-        if (!lv_obj_is_valid(home_screen)) {
-            home_screen_init();
-        }
-        lv_screen_load_anim(home_screen, LV_SCR_LOAD_ANIM_FADE_OUT, 300, 0, true);
+        LOG_DBG("Double click detected: returning to previous screen.");
+        blepairing_screen_unload();
     }
 }
 
@@ -192,11 +188,17 @@ uint8_t blepairing_screen_set_pin(const char *pin_code) {
     return 0;
 }
 
-void blepairing_screen_load(bool kill_previous) {
+void blepairing_screen_load() {
+    // Save the previous screen to unload afterwards.
+    previous_screen = lv_scr_act();
     if (!lv_obj_is_valid(blepairing_screen)) {
         blepairing_screen_init();
     }
-    // Go back to home screen with slide down animation.
-    // Do not delete the screen since register_application will generate new items.
-    lv_screen_load_anim(blepairing_screen, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, kill_previous);
+    // Load the BLE pairing screen with animation.
+    lv_screen_load_anim(blepairing_screen, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, false);
+}
+
+void blepairing_screen_unload() {
+    // Load the previous screen.
+    lv_screen_load_anim(previous_screen, LV_SCR_LOAD_ANIM_FADE_OUT, 300, 0, true);
 }

@@ -21,6 +21,16 @@ extern lv_obj_t *blepairing_screen;
 /* The init implementation for the BLE Pairing screen. */
 void blepairing_screen_init();
 
+/** Load the BLE pairing screen.
+ * @return void
+ */
+void blepairing_screen_load();
+
+/** Unload the BLE pairing screen. 
+ * @return void
+ */
+void blepairing_screen_unload();
+
 /** Event handler for BLE screen gestures.
  * @param event The event object containing gesture details.
  * @return void
@@ -32,13 +42,6 @@ void blepairing_screen_event(lv_event_t * event);
  * @return 0 on success, 1 on failure.
  */
 uint8_t blepairing_screen_set_pin(const char *pin_code);
-
-
-/** Load the BLE pairing screen.
- * @param kill_previous A boolean indicating whether to close the previous screen before loading the BLE pairing screen.
- * @return void
- */
-void blepairing_screen_load(bool kill_previous);
 
 #ifdef __cplusplus
 } // extern "C"
