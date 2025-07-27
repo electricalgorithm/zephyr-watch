@@ -63,6 +63,6 @@ BT_GATT_SERVICE_DEFINE(cts_cvs,
     BT_GATT_CHARACTERISTIC(
         BT_UUID_CTS_CURRENT_TIME,
         BT_GATT_CHRC_WRITE,
-        BT_GATT_PERM_WRITE,
+        BT_GATT_PERM_WRITE_ENCRYPT | BT_GATT_PERM_WRITE_AUTHEN,
         NULL, m_time_write_callback, dummy_data),
 );
