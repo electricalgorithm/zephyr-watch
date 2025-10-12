@@ -67,7 +67,7 @@ void blepairing_screen_init() {
     render_footer_label(footer_row);
 
     // Add event handler for gestures
-    lv_obj_add_event_cb(blepairing_screen, blepairing_screen_event, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(footer_row, blepairing_screen_event, LV_EVENT_ALL, NULL);
     LOG_DBG("BLE pairing screen initialized successfully.");
 }
 
@@ -148,7 +148,7 @@ static void render_pin_display(lv_obj_t *flex_element) {
 
 static void render_footer_label(lv_obj_t *flex_element) {
     label_footer = lv_label_create(flex_element);
-    lv_label_set_text(label_footer, "Double tap to cancel");
+    lv_label_set_text(label_footer, "Double tap here to cancel");
 
     // Center the footer
     lv_obj_set_width(label_footer, LV_SIZE_CONTENT);
@@ -157,7 +157,7 @@ static void render_footer_label(lv_obj_t *flex_element) {
 
     // Style the footer
     lv_obj_set_style_text_align(label_footer, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(label_footer, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(label_footer, &lv_font_montserrat_12, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(label_footer, lv_color_white(), LV_PART_MAIN | LV_STATE_DEFAULT);
 }
 
