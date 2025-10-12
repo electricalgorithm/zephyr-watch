@@ -2,7 +2,7 @@
  * This interface manages Bluetooth functionality, including advertising and connection handling.
  *
  * @license: GNU v3
- * @maintainer: electricalgorithm @ github 
+ * @maintainer: electricalgorithm @ github
  */
 
 #ifndef BLUETOOTH_INFRASTRUCTURE_H_
@@ -12,12 +12,12 @@
 extern "C" {
 #endif
 
-#include <zephyr/settings/settings.h>
 #include <zephyr/bluetooth/gatt.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/settings/settings.h>
 
-uint8_t enable_bluetooth_subsystem();
-uint8_t disable_bluetooth_subsystem();
+int enable_bluetooth_subsystem();
+int disable_bluetooth_subsystem();
 
 #ifdef __cplusplus
 }

@@ -14,22 +14,26 @@ extern "C" {
 
 #include "lvgl.h"
 
+/* Screen init function typedef */
+typedef void (*init_fn_t)(void);
+
 /* The screen object to be used in the userinterface. */
-extern lv_obj_t *menu_screen;
+extern lv_obj_t* menu_screen;
 
 /* The init implementation for the menu screen. */
 void menu_screen_init();
 
 /* Event handler for menu screen gestures. It is used to detect non-list events. */
-void menu_screen_event(lv_event_t * event);
+void menu_screen_event(lv_event_t* event);
 
 /**
  * Register an application to be displayed in the menu
  * @param screen The screen object for the application
+ * @param init_fn The init function of the screen
  * @param name The name of the application to display
  * @return 0 on success, -1 if maximum applications reached
  */
-int register_application(lv_obj_t *screen, char *name);
+int register_application(lv_obj_t** screen, init_fn_t init_fn, char* name);
 
 #ifdef __cplusplus
 } // extern "C"
